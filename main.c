@@ -1,15 +1,26 @@
+#include<LPC214x.h>
 #include "lcd.h"
+#include "delay.h"
+#include "adc.h"
+#include "rtc.h"
 #include "lcd_defines.h"
-#include "kpm.h"
+#include "pin_connect_block.h"
+s32 hr=0,min=0,sec=0;
+u32 adcVal;
+f32 analog;
 int main(){
-    u32 key,i=0;
     Init_LCD();
-    StrLCD("BHASKAR");
+    Init_ADC();
+    RTC_Init();
+    SetRTCTimeInfo(hr,min,sec);
     while(1){
-      key=KeyScan();
-      i++;
-      while(ColScan()==0);
-      CmdLCD(GOTO_LINE2_POS0+i);
-      U32LCD(key-'0');
+      GetRTCTimeInfo(&hr,&min,&sec);
+      Read_ADC(0,&adcVal,&analog);
+      CmdLCD(GOTO_LINE1_POS0);
+      DisplayRTCTime(hr,min,sec);
+      CmdLCD(GOTO_LINE2_POS0);
+      StrLCD("adcVal : ");
+      CmdLCD(GOTO_LINE2_POS0+9);
+      U32LCD(adcVal);
     }
 }

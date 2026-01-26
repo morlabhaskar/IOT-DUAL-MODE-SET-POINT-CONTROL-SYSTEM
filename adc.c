@@ -2,12 +2,12 @@
 #include "types.h"
 #include "delay.h"
 #include "adc_defines.h"
-#include "pin_functions_defines.h"
 #include "pin_connect_block.h"
+#include "pin_functions_defines.h"
 
 void Init_ADC(void){
     //cfg p0.27 as AINO input pin
-    CfgPortPinFunc(0,27,3);
+    CfgPortPinFunc(0,28,AIN1_0_28);
     //cfg ADCR
     ADCR = (1<<PDN_BIT)|(CLKDIV<<CLKDIV_BITS);
 }
