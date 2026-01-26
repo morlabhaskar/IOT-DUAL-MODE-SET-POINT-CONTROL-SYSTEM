@@ -1,7 +1,7 @@
 #include "types.h"
 #include "kpm_defines.h"
 #include<LPC21xx.h>
-u32 kpmLUT[4][4] = {{'7', '8', '9', '/'}, {'4', '5', '6', 'x'}, {'1', '2', '3', '-'}, {'C', '0', '=', '+'}};
+u32 kpmLUT[4][4] = {{'1', '2', '3', '/'}, {'4', '5', '6', 'x'}, {'7', '8', '9', '-'}, {'C', '0', '=', '+'}};
 
 void Init_KPM(void){
     //rows output & grounded
