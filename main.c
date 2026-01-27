@@ -1,19 +1,87 @@
 #include<LPC214x.h>
 #include "lcd.h"
+#include "system.h"
 #include "delay.h"
 #include "adc.h"
 #include "rtc.h"
+#include "spi_eeprom.h"
+#include "kpm.h"
 #include "lcd_defines.h"
 #include "pin_connect_block.h"
+#include "spi.h"
+
+#define BUZZER 23
+#define EINT0_VIC_CHNO 15
 s32 hr=0,min=0,sec=0;
-u32 adcVal;
+u32 adcVal,key;
 f32 analog;
+u8 data;
+volatile u8 menu_flag = 0;
+void show_setpoints(){
+  
+  CmdLCD(CLEAR_LCD);
+  data=ByteRead(0x0010);
+  if(data=='A'){
+    StrLCD("SAME");
+  }else{
+    StrLCD("NOT SAME");
+  }
+  delay_ms(2000);
+  CmdLCD(CLEAR_LCD);
+}
+void update_setpoints(){
+  CmdLCD(CLEAR_LCD);
+  ByteWrite(0x0010,'A');
+  delay_ms(10);
+  StrLCD("SUCCESS");
+  delay_ms(2000);
+  CmdLCD(CLEAR_LCD);
+  data=ByteRead(0x0010);
+  if(data=='A'){
+    StrLCD("SAME");
+  }else{
+    StrLCD("NOT SAME");
+  }
+  delay_ms(2000);
+  CmdLCD(CLEAR_LCD);
+}
+void eint0_isr(void) __irq{
+     menu_flag = 1;
+    //eint0 isr user activity ends
+    //clear EINT0 status in External Interrupt Peripheral 
+    EXTINT = 1<<0;
+    //clear EINT0 status in VIC peripheral
+    VICVectAddr = 0;
+}
 int main(){
-    Init_LCD();
-    Init_ADC();
-    RTC_Init();
+    Init_system();
+    Init_SPI0();
+    IOCLR0 = 1<<BUZZER;
+
+    //cfg p0.1 pin as EINT0 input pin
+    CfgPortPinFunc(0,3,3);
+    VICIntEnable = 1<<EINT0_VIC_CHNO;
+    VICVectCntl0 = (1<<5) | EINT0_VIC_CHNO;
+    VICVectAddr0 = (u32)eint0_isr;
+    EXTMODE  = 1<<0;   // Edge trigger
+    EXTPOLAR = 0;      // Falling edge
+
     SetRTCTimeInfo(hr,min,sec);
     while(1){
+      if(menu_flag){
+            menu_flag = 0;
+            CmdLCD(CLEAR_LCD);
+            CmdLCD(GOTO_LINE1_POS0);
+            StrLCD("1:SHOW SET PTS");
+            CmdLCD(GOTO_LINE2_POS0);
+            StrLCD("2:UPDATE SET PTS");
+
+            key = KeyScan();
+            while(ColScan()==0);
+
+            if(key=='1') show_setpoints();
+            else if(key=='2') update_setpoints();
+        }
       GetRTCTimeInfo(&hr,&min,&sec);
       Read_ADC(0,&adcVal,&analog);
       CmdLCD(GOTO_LINE1_POS0);

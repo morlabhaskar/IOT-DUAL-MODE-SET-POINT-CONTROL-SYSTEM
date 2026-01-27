@@ -47,7 +47,7 @@ minute value (0 59)
 second value (0 59) seperated by ':'
 */
 void DisplayRTCTime(u32 hour, u32 minute, u32 second){
-	CmdLCD(GOTO_LINE1_POS0+2);
+	CmdLCD(GOTO_LINE1_POS0);
 	CharLCD((hour/10)+48);
 	CharLCD((hour%10)+48);
 	CharLCD(':');
