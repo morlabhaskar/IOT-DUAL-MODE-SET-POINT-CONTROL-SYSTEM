@@ -28,7 +28,7 @@ u8 ByteRead(u16 addr){
     SPI0(addr>>8);//msbyte of 16-bit address loc to be written into
     SPI0(addr);//lsbyte of 16-bit address loc to be written into
 
-    data=SPI0(0xFF);//sending garbage & reading data at loc
+    data=SPI0(0x00);//sending garbage & reading data at loc
     IOSET0 = (1<<CS);
     return data;
 }

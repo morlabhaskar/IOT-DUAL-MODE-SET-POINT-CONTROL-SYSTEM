@@ -1,4 +1,4 @@
-#include<LPC214x.h>
+#include<LPC21xx.h>
 #include "lcd.h"
 #include "system.h"
 #include "delay.h"
@@ -53,6 +53,8 @@ void eint0_isr(void) __irq{
     //clear EINT0 status in VIC peripheral
     VICVectAddr = 0;
 }
+u8 d;
+u32 i;
 int main(){
     Init_system();
     Init_SPI0();
@@ -70,17 +72,29 @@ int main(){
     while(1){
       if(menu_flag){
             menu_flag = 0;
-            CmdLCD(CLEAR_LCD);
-            CmdLCD(GOTO_LINE1_POS0);
-            StrLCD("1:SHOW SET PTS");
-            CmdLCD(GOTO_LINE2_POS0);
-            StrLCD("2:UPDATE SET PTS");
+            ByteWrite(i,'a');
+            delay_ms(10);
+            d=ByteRead(i);
+            if(d =='a'){
+              IOSET0 = 1<<BUZZER;
+              delay_ms(2000);
+            }else{
+              CmdLCD(CLEAR_LCD);
+              StrLCD("NOT CORRECT");
+              delay_ms(1000);
+            }
+            
+            // CmdLCD(CLEAR_LCD);
+            // CmdLCD(GOTO_LINE1_POS0);
+            // StrLCD("1:SHOW SET PTS");
+            // CmdLCD(GOTO_LINE2_POS0);
+            // StrLCD("2:UPDATE SET PTS");
 
-            key = KeyScan();
-            while(ColScan()==0);
+            // key = KeyScan();
+            // while(ColScan()==0);
 
-            if(key=='1') show_setpoints();
-            else if(key=='2') update_setpoints();
+            // if(key=='1') show_setpoints();
+            // else if(key=='2') update_setpoints();
         }
       GetRTCTimeInfo(&hr,&min,&sec);
       Read_ADC(0,&adcVal,&analog);
