@@ -1,15 +1,14 @@
 #include<LPC21xx.h>
 #include "uart_defines.h"
 #include "types.h"
+#include "pin_connect_block.h"
 #include "delay.h"
 
 
 void UART0_Init(void){
     //cfg p0.0 as TXDO and p0.1 as RXDO 
-    // CfgPortPinFunc(0,0,TXDO_PIN_0_1);
-    // CfgPortPinFunc(0,1,RXDO_PIN_0_1);
-    PINSEL0 = ((PINSEL0 &~(3<<(0*2))) | (1<<(0*2)));
-    PINSEL0 = ((PINSEL0 &~(3<<(1*2))) | (1<<(1*2)));
+    CfgPortPinFunc(0,0,TXDO_PIN_0_1);
+    CfgPortPinFunc(0,1,RXDO_PIN_0_1);
     //cfg UART0 line control for:
     //8 data bits,No parity,1 stop bit(8N1)
     //DLAB = 1 (to access baud rate divisor register)

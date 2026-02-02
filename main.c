@@ -9,10 +9,11 @@
 #include "lcd_defines.h"
 #include "pin_connect_block.h"
 #include "spi.h"
+#include "uart0.h"
 
 #define BUZZER 23
 #define EINT0_VIC_CHNO 15
-s32 hr=0,min=0,sec=0;
+s32 hr=0,min=0,sec=50;
 u32 adcVal,key;
 f32 analog;
 u8 data;
@@ -81,14 +82,15 @@ void eint0_isr(void) __irq{
     //clear EINT0 status in VIC peripheral
     VICVectAddr = 0;
 }
-
+s32 prev_min = 100;
 int main(){
     Init_system();
     Init_SPI0();
+    UART0_Init();
     IOCLR0 = 1<<BUZZER;
     //cfg p0.1 pin as EINT0 input pin
     CfgPortPinFunc(0,3,3);
-        VICIntEnable = 1<<EINT0_VIC_CHNO;
+    VICIntEnable = 1<<EINT0_VIC_CHNO;
     VICVectCntl0 = (1<<5) | EINT0_VIC_CHNO;
     VICVectAddr0 = (u32)eint0_isr;
     EXTMODE = 1<<1;   // Edge trigger
@@ -110,11 +112,16 @@ int main(){
     }
       GetRTCTimeInfo(&hr,&min,&sec);
       Read_ADC(1,&adcVal,&analog);
+      if(min!=prev_min){
+          prev_min=min;
+          UART0_TxInt(adcVal);
+          UART0_TxChar('-');
+      }
       CmdLCD(GOTO_LINE1_POS0);
       DisplayRTCTime(hr,min,sec);
       CmdLCD(GOTO_LINE2_POS0);
       StrLCD("adcVal : ");
-          CmdLCD(GOTO_LINE2_POS0+9);
-          U32LCD(adcVal);
+      CmdLCD(GOTO_LINE2_POS0+9);
+      U32LCD(adcVal);
     }
 }
