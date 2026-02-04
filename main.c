@@ -30,19 +30,8 @@ void show_setpoints(){
   StrLCD("DATA : ");
   CmdLCD(GOTO_LINE1_POS0+8);
   StrLCD(arr);
-  delay_ms(1000);
+  delay_ms(2000);
   CmdLCD(CLEAR_LCD);
-
-
-  // CmdLCD(CLEAR_LCD);
-  // data=ByteRead(0x0010);
-  // if(data=='A'){
-  //   StrLCD("SAME");
-  // }else{
-  //   StrLCD("NOT SAME");
-  // }
-  // delay_ms(2000);
-  // CmdLCD(CLEAR_LCD);
 }
 void update_setpoints(){
   int i;
@@ -58,28 +47,12 @@ void update_setpoints(){
   }
   CmdLCD(CLEAR_LCD);
   StrLCD("WRITTEN");
-  delay_ms(1000);
+  delay_ms(2000);
   CmdLCD(CLEAR_LCD);
-
-  // CmdLCD(CLEAR_LCD);
-  // ByteWrite(0x0010,'A');
-  // delay_ms(10);
-  // StrLCD("WRITTEN");
-  // delay_ms(2000);
-  // CmdLCD(CLEAR_LCD);
-  // data=ByteRead(0x0010);
-  // if(data=='A'){
-  //   StrLCD("SAME");
-  // }else{
-  //   StrLCD("NOT SAME");
-  // }
-  // delay_ms(2000);
-  // CmdLCD(CLEAR_LCD);
 }
 void eint0_isr(void) __irq{
      menu_flag = 1;
     EXTINT = 1<<1;
-    //clear EINT0 status in VIC peripheral
     VICVectAddr = 0;
 }
 s32 prev_min = 100;
@@ -88,7 +61,6 @@ int main(){
     Init_SPI0();
     UART0_Init();
     IOCLR0 = 1<<BUZZER;
-    //cfg p0.1 pin as EINT0 input pin
     CfgPortPinFunc(0,3,3);
     VICIntEnable = 1<<EINT0_VIC_CHNO;
     VICVectCntl0 = (1<<5) | EINT0_VIC_CHNO;
@@ -109,7 +81,7 @@ int main(){
             while(ColScan()==0);
             if(key=='1') show_setpoints();
             else if(key=='2') update_setpoints();
-    }
+        }
       GetRTCTimeInfo(&hr,&min,&sec);
       Read_ADC(1,&adcVal,&analog);
       if(min!=prev_min){
@@ -120,8 +92,12 @@ int main(){
       CmdLCD(GOTO_LINE1_POS0);
       DisplayRTCTime(hr,min,sec);
       CmdLCD(GOTO_LINE2_POS0);
-      StrLCD("adcVal : ");
-      CmdLCD(GOTO_LINE2_POS0+9);
+      StrLCD("ADCval : ");
+      CmdLCD(GOTO_LINE2_POS0+10);
       U32LCD(adcVal);
+      CmdLCD(GOTO_LINE3_POS0);
+      StrLCD("ENTER SWITCH");
+      CmdLCD(GOTO_LINE4_POS0);
+      StrLCD("FOR MENU");
     }
 }

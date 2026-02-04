@@ -19,8 +19,8 @@
 #define MODE_4BIT_2LINE    0x28
 #define GOTO_LINE1_POS0    0x80
 #define GOTO_LINE2_POS0    0xC0
-#define GOTO_LINE3_POS0    0x94
-#define GOTO_LINE4_POS0    0xD4
+#define GOTO_LINE3_POS0    0x90
+#define GOTO_LINE4_POS0    0xD0
 #define GOTO_CGRAM_START   0x40
 #define LCD_DATA           8
 #define LCD_RS             16
