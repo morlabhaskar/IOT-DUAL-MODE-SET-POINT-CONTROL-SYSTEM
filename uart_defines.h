@@ -31,6 +31,8 @@
 #define THRE_BIT 5
 #define TEMT_BIT 6
 
+#define UART_INT_ENABLE 1
+
 #endif
 
 

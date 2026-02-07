@@ -11,16 +11,23 @@
 #include "pin_connect_block.h"
 #include "spi.h"
 #include "uart0.h"
+#include "eint.h"
 #include "ESP01.h"
 
 #define BUZZER 23
-#define EINT0_VIC_CHNO 15
+// #define EINT0_VIC_CHNO 15
 s32 hr=0,min=0,sec=50;
 u32 adcVal,key;
 f32 analog;
 char adcStr[10]; 
 u8 data;
-u32 menu_flag = 0;
+// extern u32 menu_flag;
+// extern s8 buf[100],dummy;
+// extern u8 x=0,ch,r_flag;
+extern volatile s8 buf[100];
+extern volatile u8 x;
+extern volatile u8 ch;
+extern volatile u8 r_flag;
 void show_setpoints(){
 	int i;
   s8 arr[5];
@@ -53,25 +60,27 @@ void update_setpoints(){
   delay_ms(2000);
   CmdLCD(CLEAR_LCD);
 }
-void eint0_isr(void) __irq{
-     menu_flag = 1;
-    EXTINT = 1<<1;
-    VICVectAddr = 0;
-}
+
 s32 prev_min = 100;
 int main(){
-    Init_system();
+    // Init_system();
+    // UART0_Init();
+    Init_LCD();
+    Init_ADC();
+    RTC_Init();
+    Init_KPM();
     Init_SPI0();
-    UART0_Init();
-    ConnectESP();
+    EINT0_Init();
+    // ConnectESP();
     IOCLR0 = 1<<BUZZER;
-    CfgPortPinFunc(0,3,3);
-    VICIntEnable = 1<<EINT0_VIC_CHNO;
-    VICVectCntl0 = (1<<5) | EINT0_VIC_CHNO;
-    VICVectAddr0 = (u32)eint0_isr;
-    EXTMODE = 1<<1;   // Edge trigger
-    EXTPOLAR = 0;      // Falling edge
-    EXTINT = 1<<1;
+    menu_flag=0;
+    // CfgPortPinFunc(0,3,3);
+    // VICIntEnable = 1<<EINT0_VIC_CHNO;
+    // VICVectCntl0 = (1<<5) | EINT0_VIC_CHNO;
+    // VICVectAddr0 = (u32)eint0_isr;
+    // EXTMODE = 1<<1;   // Edge trigger
+    // EXTPOLAR = 0;      // Falling edge
+    // EXTINT = 1<<1;
     SetRTCTimeInfo(hr,min,sec);
     while(1){
       if(menu_flag){
@@ -91,9 +100,9 @@ int main(){
       sprintf(adcStr, "%lu", adcVal);
       if(min!=prev_min){
         prev_min=min;
-        //   UART0_TxInt(adcVal);
-        //   UART0_TxChar('-');
-        updateThingSpeak(adcStr);
+          UART0_TxInt(adcVal);
+          UART0_TxChar('-');
+        // updateThingSpeak(adcStr);
       }
       CmdLCD(GOTO_LINE1_POS0);
       DisplayRTCTime(hr,min,sec);
