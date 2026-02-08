@@ -1,387 +1,357 @@
-
-#include "esp01.h"
-#include "uart0.h"
+#include <string.h>
 #include "uart0.h"
 #include "delay.h"
+#include "types.h"
 #include "lcd.h"
 #include "lcd_defines.h"
-#include <string.h>
 
-/* fake connecton testing 
-void esp01_connectAP(void)
- { UART0_Str("AT\r\n");
-    delay_ms(200);
-    UART0_Str("OK\r\n");
+extern u8 value[20];
+extern char buff[200];
+extern unsigned char i;
 
-    UART0_Str("ATE0\r\n");
-    delay_ms(200);
-    UART0_Str("OK\r\n");
-
-    UART0_Str("AT+CIPMUX=0\r\n");
-    delay_ms(200);
-    UART0_Str("OK\r\n");
-
-    UART0_Str("AT+CWJAP=\"SIM\",\"1234\"\r\n");
-    delay_ms(200);
-    UART0_Str("WIFI CONNECTED\r\n");
-	}*/
-	
-//unsigned char i;
-
-// sir code
-void esp01_connectAP(void){
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
+void esp01_connectAP(){
+	CmdLCD(0x01);
+	CmdLCD(0x80);
 	StrLCD("AT");
 	delay_ms(1000);
-	UART0_Str("AT\r\n");
-	i=0;
-	memset((void*)buff,'\0',200);
-	while(i<4);
+	uart0_str("AT\r\n");
+	i = 0;
+	memset(buff, '\0', 200);
+	while(i < 4);
 	delay_ms(500);
 	buff[i] = '\0';
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
-	StrLCD((s8*)buff);
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD(buff);
 	delay_ms(2000);
-	if(strstr((char*)buff,"OK")){
-		CmdLCD(GOTO_LINE2_POS0);
+	if(strstr(buff, "OK")){
+		CmdLCD(0xC0);
 		StrLCD("OK");
-		delay_ms(1000);		
-	}else{
-		CmdLCD(GOTO_LINE2_POS0);
-		StrLCD("ERROR");
-		delay_ms(1000);		
-		return;
-	}
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
-	StrLCD("ATE0");
-	delay_ms(1000);
-	UART0_Str("ATE0\r\n");
-	i=0;
-	memset((void*)buff,'\0',200);
-	while(i<4);
-	delay_ms(500);
-	buff[i] = '\0';
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
-	StrLCD((s8*)buff);
-	delay_ms(2000);
-	if(strstr((char*)buff,"OK")){
-		CmdLCD(GOTO_LINE2_POS0);
-		StrLCD("OK");
-		delay_ms(1000);		
-	}else{
-		CmdLCD(GOTO_LINE2_POS0);
-		StrLCD("ERROR");
-		delay_ms(1000);		
-		return;
-	}
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
-	StrLCD("AT+CIPMUX");
-	delay_ms(1000);
-	UART0_Str("AT+CIPMUX=0\r\n");//Single TCP/UDP connection mode
-	i=0;
-	memset((void*)buff,'\0',200);
-	while(i<4);
-	delay_ms(500);
-	buff[i] = '\0';
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
-	StrLCD((s8*)buff);
-	delay_ms(2000);
-	if(strstr((char*)buff,"OK")){
-		CmdLCD(GOTO_LINE2_POS0);
-		StrLCD("OK");
-		delay_ms(1000);		
+		delay_ms(1000);
 	}
 	else{
-		CmdLCD(GOTO_LINE2_POS0);
+		CmdLCD(0xC0);
 		StrLCD("ERROR");
-		delay_ms(1000);		
-		return;
+		delay_ms(1000);
 	}
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD("ATE0");
+	delay_ms(1000);
+	uart0_str("ATE0\r\n");
+	i = 0;
+	memset(buff, '\0', 200);
+	while(i < 4);
+	delay_ms(500);
+	buff[i] = '\0';
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD(buff);
+	delay_ms(2000);
+	if(strstr(buff, "OK")){
+		CmdLCD(0xC0);
+		StrLCD("OK");
+		delay_ms(1000);
+	}
+	else{
+		CmdLCD(0xC0);
+		StrLCD("ERROR");
+		delay_ms(1000);
+	}
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD("AT+CIPMUX");
+	delay_ms(1000);
+	uart0_str("AT+CIPMUX=0\r\n");
+	i = 0;
+	memset(buff, '\0', 200);
+	while(i<4);
+	delay_ms(500);
+	buff[i] = '\0';
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD(buff);
+	delay_ms(2000);
+	if(strstr(buff, "OK")){
+		CmdLCD(0xC0);
+		StrLCD("OK");
+		delay_ms(1000);
+	}
+	else{
+		CmdLCD(0xC0);
+		StrLCD("ERROR");
+		delay_ms(1000);
+	}
+	CmdLCD(0x01);
+	CmdLCD(0x80);
 	StrLCD("AT+CWQAP");
 	delay_ms(1000);
-	UART0_Str("AT+CWQAP\r\n");
-	i=0;memset((void*)buff,'\0',200);
-	while(i<4);
+	uart0_str("AT+CWQAP\r\n");
+	i = 0;
+	memset(buff, '\0', 200);
+	while(i < 4);
 	delay_ms(1500);
 	buff[i] = '\0';
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
-	StrLCD((s8*)buff);
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD(buff);
 	delay_ms(2000);
-	if(strstr((char*)buff,"OK")){
-		CmdLCD(GOTO_LINE2_POS0);
+	if(strstr(buff, "OK")){
+		CmdLCD(0xC0);
 		StrLCD("OK");
-		delay_ms(1000);		
-	}else{
-		CmdLCD(GOTO_LINE2_POS0);
-		StrLCD("ERROR");
-		delay_ms(1000);		
-		return;
+		delay_ms(1000);
 	}
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
+	else{
+		CmdLCD(0xC0);
+		StrLCD("ERROR");
+		delay_ms(1000);
+	}
+	CmdLCD(0x01);
+	CmdLCD(0x80);
 	StrLCD("AT+CWJAP");
 	delay_ms(1000);
-	//need to change the wifi network name and password
-	UART0_Str("AT+CWJAP=\"NANI\",\"6303431098\"\r\n");
-	i=0;memset((void*)buff,'\0',200);
-	while(i<4);
+	// need to change the wifi network name and password
+	uart0_str("AT+CWJAP=\"NANI\",\"12345678\"\r\n");
+	i = 0;
+	memset(buff, '\0', 200);
+	while(i < 4);
 	delay_ms(2500);
 	buff[i] = '\0';
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
-	StrLCD((s8*)buff);
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD(buff);
 	delay_ms(2000);
-	if(strstr((char*)buff,"WIFI CONNECTED")){
-		CmdLCD(GOTO_LINE2_POS0);
+	if(strstr(buff, "WIFI CONNECTED")){
+		CmdLCD(0xC0);
 		StrLCD("OK");
-		delay_ms(1000);		
-	}else{
-		CmdLCD(GOTO_LINE2_POS0);
+		delay_ms(1000);
+	}
+	else{
+		CmdLCD(0xC0);
 		StrLCD("ERROR");
-		delay_ms(1000);		
+		delay_ms(1000);
 		return;
 	}
 }
-void esp01_sendToThingspeak(char *val){
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
+void esp01_sendToThingspeak(f32 val){
+	CmdLCD(0x01);
+	CmdLCD(0x80);
 	StrLCD("AT+CIPSTART");
 	delay_ms(1000);
-	UART0_Str("AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80\r\n");
-	i=0;memset((void*)buff,'\0',200);
-	while(i<5);
+	uart0_str("AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80\r\n");
+	i = 0;
+	memset(buff, '\0', 200);
+	while(i < 5);
 	delay_ms(2500);
 	buff[i] = '\0';
-	CmdLCD(CLEAR_LCD);
-	CmdLCD(GOTO_LINE1_POS0);
-	StrLCD((s8*)buff);
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD(buff);
 	delay_ms(2000);
-	if(strstr((char*)buff,"CONNECT") || strstr((char*)buff,"ALREADY CONNECTED")){
-		CmdLCD(GOTO_LINE2_POS0);
+	if(strstr(buff, "CONNECT") || strstr(buff, "ALREADY CONNECTED")){
+		CmdLCD(0xC0);
 		StrLCD("OK");
 		delay_ms(1000);
-		CmdLCD(CLEAR_LCD);
-		CmdLCD(GOTO_LINE1_POS0);
+		CmdLCD(0x01);
+		CmdLCD(0x80);
 		StrLCD("AT+CIPSEND");
 		delay_ms(1000);
-		UART0_Str("AT+CIPSEND=51\r\n");
-		i=0;memset((void*)buff,'\0',200);
-		//while(buff[i] != '>');
+		uart0_str("AT+CIPSEND=52\r\n");
+		i = 0;
+		memset(buff, '\0', 200);
+		// while(buff[i] != '>');
 		delay_ms(500);
-		//need to change the thingspeak write API key accordind to your channel
-		UART0_Str("GET /update?api_key=ZNGKKV1G8F3C6F0Z&field1=");
-		UART0_Str(val);
-		UART0_Str("\r\n\r\n");
+		// need to change the thingspeak write API key accordind to your channel
+		uart0_str("GET /update?api_key=AW76V91LT5W2U63Z&field1=");
+		// uart0_str(val);
+		uart0_float(val);
+		uart0_str("\r\n\r\n");
 		delay_ms(5000);
 		delay_ms(5000);
 		buff[i] = '\0';
-		CmdLCD(CLEAR_LCD);
-		CmdLCD(GOTO_LINE1_POS0);
-		StrLCD((s8*)buff);
+		CmdLCD(0x01);
+		CmdLCD(0x80);
+		StrLCD(buff);
 		delay_ms(2000);
-		if(strstr((char*)buff,"SEND OK")){
-			CmdLCD(CLEAR_LCD);
+		if(strstr(buff, "SEND OK")){
+			CmdLCD(0x01);
 			StrLCD("DATA UPDATED");
-			delay_ms(1000);			
+			delay_ms(1000);
+		}
+		else if(!strstr(buff, "CLOSED")){
+			CmdLCD(0x01);
+			CmdLCD(0x80);
+			StrLCD("AT+CIPCLOSE");
+			delay_ms(1000);
+			uart0_str("AT+CIPCLOSE\r\n");
+			i = 0;
+			memset(buff, '\0', 200);
+			while(i < 5);
+			delay_ms(2500);
+			buff[i] = '\0';
+			CmdLCD(0x01);
+			CmdLCD(0x80);
+			StrLCD(buff);
+			delay_ms(2000);
+			if(strstr(buff, "OK")){
+				CmdLCD(0x01);
+				CmdLCD(0x80);
+				StrLCD("OK");
+				delay_ms(2000);
+			}
+			else{
+				CmdLCD(0x01);
+				CmdLCD(0x80);
+				StrLCD("ERROR");
+				delay_ms(2000);
+			}
 		}
 		else{
-			CmdLCD(CLEAR_LCD);
+			CmdLCD(0x01);
 			StrLCD("DATA NOT UPDATED");
-			delay_ms(1000);	
+			delay_ms(1000);
 		}
-	}else{
-		CmdLCD(GOTO_LINE2_POS0);
+	}
+	else{
+		CmdLCD(0xC0);
 		StrLCD("ERROR");
-		delay_ms(1000);		
+		delay_ms(1000);
 		return;
-	}	
+	}
 }
-
-/*
-// corrected by chatgpt
-void esp01_connectAP(void){
-    CmdLCD(CLEAR_LCD);
-    CmdLCD(GOTO_LINE1_POS0);
-    StrLCD("AT");
-    UART0_Str("AT\r\n");
-    r_flag = 0;                      // reset RX flag
-    while(r_flag == 0);              // wait till ISR completes RX
-    r_flag = 0;
-    CmdLCD(CLEAR_LCD);
-    CmdLCD(GOTO_LINE1_POS0);
-    StrLCD((s8*)buff);                    // show response
-    delay_ms(1500);
-    if(!strstr((char*)buff, "OK"))
-        return;
-
-    CmdLCD(CLEAR_LCD);
-    StrLCD("ATE0");
-    UART0_Str("ATE0\r\n");
-
-    r_flag = 0;
-    while(r_flag == 0);
-    r_flag = 0;
-
-    if(!strstr((char*)buff, "OK"))
-        return;
-
-    CmdLCD(CLEAR_LCD);
-    StrLCD("CIPMUX");
-
-    UART0_Str("AT+CIPMUX=0\r\n");
-
-    r_flag = 0;
-    while(r_flag == 0);
-    r_flag = 0;
-
-    if(!strstr((char*)buff, "OK"))
-        return;
-
-    CmdLCD(CLEAR_LCD);
-    StrLCD("CONNECTING");
-
-    UART0_Str("AT+CWJAP=\"NANI\",\"6303431098\"\r\n");
-
-    r_flag = 0;
-    while(r_flag == 0);              // WiFi response
-    r_flag = 0;
-
-    CmdLCD(CLEAR_LCD);
-    CmdLCD(GOTO_LINE1_POS0);
-    StrLCD((s8*)buff);
-
-    delay_ms(2000);
+void esp01_sendToThingspeak_set_point(float val){
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD("AT+CIPSTART");
+	delay_ms(1000);
+	uart0_str("AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80\r\n");
+	i = 0;
+	memset(buff, '\0', 200);
+	while(i < 5);
+	delay_ms(2500);
+	buff[i] = '\0';
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD(buff);
+	delay_ms(2000);
+	if(strstr(buff, "CONNECT") || strstr(buff, "ALREADY CONNECTED")){
+		CmdLCD(0xC0);
+		StrLCD("OK");
+		delay_ms(1000);
+		CmdLCD(0x01);
+		CmdLCD(0x80);
+		StrLCD("AT+CIPSEND");
+		delay_ms(1000);
+		uart0_str("AT+CIPSEND=52\r\n");
+		i = 0;
+		memset(buff, '\0', 200);
+		// while(buff[i] != '>');
+		delay_ms(500);
+		// need to change the thingspeak write API key accordind to your channel
+		uart0_str("GET /update?api_key=2Q89OQYP2T26DANX&field1=");
+		// uart0_str(val);
+		uart0_float(val);
+		uart0_str("\r\n\r\n");
+		delay_ms(5000);
+		delay_ms(5000);
+		buff[i] = '\0';
+		CmdLCD(0x01);
+		CmdLCD(0x80);
+		StrLCD(buff);
+		delay_ms(2000);
+		if(strstr(buff, "OK")){
+			CmdLCD(0x01);
+			StrLCD("DATA UPDATED");
+			delay_ms(1000);
+		}
+		else if(!strstr(buff, "CLOSED")){
+			CmdLCD(0x01);
+			CmdLCD(0x80);
+			StrLCD("AT+CIPCLOSE");
+			delay_ms(1000);
+			uart0_str("AT+CIPCLOSE\r\n");
+			i = 0;
+			memset(buff, '\0', 200);
+			while (i < 5);
+			delay_ms(2500);
+			buff[i] = '\0';
+			CmdLCD(0x01);
+			CmdLCD(0x80);
+			StrLCD(buff);
+			delay_ms(2000);
+			if (strstr(buff, "OK")){
+				CmdLCD(0x01);
+				CmdLCD(0x80);
+				StrLCD("OK");
+				delay_ms(2000);
+			}
+			else{
+				CmdLCD(0x01);
+				CmdLCD(0x80);
+				StrLCD("ERROR");
+				delay_ms(2000);
+			}
+		}
+		else{
+			CmdLCD(0x01);
+			StrLCD("DATA NOT UPDATED");
+			delay_ms(1000);
+		}
+	}
+	else{
+		CmdLCD(0xC0);
+		StrLCD("ERROR");
+		delay_ms(1000);
+		return;
+	}
 }
-// coorected by chatgpt 
-void esp01_sendToThingspeak(char *val)
-{
-    CmdLCD(CLEAR_LCD);
-    StrLCD("CIPSTART");
-
-    UART0_Str("AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80\r\n");
-
-    r_flag = 0;
-    while(r_flag == 0);
-    r_flag = 0;
-
-    if(!(strstr((char*)buff,"CONNECT") || strstr((char*)buff,"ALREADY")))
-        return;
-
-    CmdLCD(CLEAR_LCD);
-    StrLCD("CIPSEND");
-
-    UART0_Str("AT+CIPSEND=51\r\n");
-
-    r_flag = 0;
-    while(r_flag == 0);
-    r_flag = 0;
-
-    if(!strstr((char*)buff, ">"))
-        return;
-
-    // UART0_Str("GET /update?api_key=PMSMTM72RNBJSXYH&field1=");
-    UART0_Str("GET /update?api_key=ZNGKKV1G8F3C6F0Z&field1=");
-    UART0_Str(val);
-    UART0_Str("\r\n\r\n");
-
-    r_flag = 0;
-    while(r_flag == 0);
-    r_flag = 0;
-
-    CmdLCD(CLEAR_LCD);
-    CmdLCD(GOTO_LINE1_POS0);
-    StrLCD((s8*)buff);
-
-    delay_ms(2000);
+void esp01_readFromThingspeak(){
+	char *ptr = NULL, *p = NULL;
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD("CIPSTART");
+	delay_ms(1000);
+	uart0_str("AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80\r\n");
+	i = 0;
+	memset(buff, '\0', 200);
+	while (i < 5);
+	delay_ms(2500);
+	buff[i] = '\0';
+	CmdLCD(0x01);
+	CmdLCD(0x80);
+	StrLCD(buff);
+	delay_ms(2000);
+	if (strstr(buff, "CONNECT") || strstr(buff, "ALREADY CONNECTED")){
+		CmdLCD(0x01);
+		CmdLCD(0x80);
+		StrLCD("CIPSEND");
+		delay_ms(1000);
+		/* 48 bytes approx */
+		uart0_str("AT+CIPSEND=66\r\n");
+		delay_ms(500);
+		uart0_str("GET /channels/3240963/feeds/last.json?api_key=E589ZQ1IHA7665RJ\r\n\r\n");
+		delay_ms(5000);
+		buff[i] = '\0';
+		ptr = strrchr(buff, ':');
+		p = strrchr(buff, '}');
+		p -= 1;
+		ptr += 2;
+		ptr[p - (ptr)] = '\0';
+		// value=ptr;
+		strcpy((char *)value, ptr);
+		if ((char *)value){
+			CmdLCD(0x01);
+			CmdLCD(0x80);
+			StrLCD((s8 *)value);
+			delay_ms(2000);
+		}
+		uart0_str("AT+CIPCLOSE\r\n");
+		delay_ms(1000);
+	}
+	else{
+		CmdLCD(0x01);
+		StrLCD("ERROR");
+		delay_ms(2000);
+		return;
+	}
 }
-*/
-/* ===== INTERNAL HELPER ===== */
-/*static unsigned char ESP01_WaitForResponse(char *resp, unsigned int timeout_ms)
-{
-    unsigned int t = 0;
-
-    while(!r_flag && t < timeout_ms)
-    {
-        delay_ms(1);
-        t++;
-    }
-
-    if(!r_flag)
-        return 0;     // Timeout
-
-    r_flag = 0;
-
-    if(strstr((char*)buff, resp))
-        return 1;
-
-    return 0;
-}
-
-unsigned char ESP01_SendCmd(char *cmd, char *resp, unsigned int timeout_ms)
-{
-    UART0_Str(cmd);
-    UART0_Str("\r\n");
-
-    memset((char*)buff, 0, sizeof(buff));
-    r_flag = 0;
-
-    return ESP01_WaitForResponse(resp, timeout_ms);
-}
-
-void ESP01_Init(void)
-{
-    CmdLCD(CLEAR_LCD);
-    CmdLCD(GOTO_LINE1_POS0);
-    StrLCD("ESP INIT");
-
-    ESP01_SendCmd("AT", "OK", 1000);
-    ESP01_SendCmd("ATE0", "OK", 1000);
-    ESP01_SendCmd("AT+CWMODE=1", "OK", 1000);
-}
-
-unsigned char ESP01_ConnectAP(char *ssid, char *pwd)
-{
-    char cmd[80];
-
-    CmdLCD(CLEAR_LCD);
-    CmdLCD(GOTO_LINE1_POS0);
-    StrLCD("WIFI CONNECT");
-
-    strcpy(cmd, "AT+CWJAP=\"");
-    strcat(cmd, ssid);
-    strcat(cmd, "\",\"");
-    strcat(cmd, pwd);
-    strcat(cmd, "\"");
-
-    return ESP01_SendCmd(cmd, "WIFI CONNECTED", 8000);
-}
-
-unsigned char ESP01_SendToThingSpeak(char *api_key, char *field_val)
-{
-    char cmd[120];
-
-    if(!ESP01_SendCmd(
-        "AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80",
-        "CONNECT",
-        5000))
-        return 0;
-
-    sprintf(cmd,
-        "GET /update?api_key=%s&field1=%s\r\n\r\n",
-        api_key, field_val);
-
-    ESP01_SendCmd("AT+CIPSEND=51", ">", 3000);
-    UART0_Str(cmd);
-
-    return ESP01_WaitForResponse("SEND OK", 6000);
-}
-*/
