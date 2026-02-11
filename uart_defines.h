@@ -1,6 +1,8 @@
 #ifndef __UART0_DEFINES_H__
 #define __UART0_DEFINES_H__
 
+#define UART_INT_ENABLE 1
+
 #define FUNC2         1
 #define TXDO_PIN_NO   0
 #define RXD0_PIN_NO   1

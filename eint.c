@@ -6,7 +6,7 @@
 #define EINT0_LED 16
 #define EINT0_VIC_CHNO 15
 
-volatile u32 menu_flag=0;
+extern u32 menu_flag;
 
 void eint0_isr(void) __irq{
     menu_flag = 1;
@@ -31,9 +31,9 @@ void EINT0_Init(void){
 //   SETBIT(EXTPOLAR,0);	
   CfgPortPinFunc(0,3,3);
     VICIntEnable = 1<<EINT0_VIC_CHNO;
-    VICVectCntl0 = (1<<5) | EINT0_VIC_CHNO;
-    VICVectAddr0 = (u32)eint0_isr;
+    VICVectCntl1 = (1<<5) | EINT0_VIC_CHNO;
+    VICVectAddr1 = (u32)eint0_isr;
     EXTMODE = 1<<1;   // Edge trigger
-    EXTPOLAR = 0;      // Falling edge
-    EXTINT = 1<<1;
+    // EXTPOLAR = 0;      // Falling edge
+    // EXTINT = 1<<1;
 }	

@@ -5,9 +5,9 @@
 #include "uart0.h"
 #include "types.h"
 char buff[200] = "hello", dummy;
-volatile unsigned char i = 0, ch, r_flag;
+unsigned char i = 0, ch, r_flag;
 void uart0_isr(void) __irq{
-    if ((U0IIR & 0x04)){ // check if receive interrupt
+    if((U0IIR & 0x04)){ // check if receive interrupt
         ch = U0RBR; /* Read to Clear Receive Interrupt */
         if (i < 200)
             buff[i++] = ch;
@@ -18,13 +18,7 @@ void uart0_isr(void) __irq{
     VICVectAddr = 0; /* dummy write */
 }
 void uart0_init(){
-    /* cfgportpinfunc(0,0,TXD0_PIN_0_0 );
-           cfgportpinfunc(0,1,RXD0_PIN_0_1);
-           U0LCR=WORD_LEN|(1<<DLAB_BIT);
-           U0DLL=DIVISOR;
-           U0DLM=DIVISOR>>8;
-           U0LCR&=~(1<<DLAB_BIT); */
-    PINSEL0 |= 0x00000005; /* Enable RxD0 and TxD0              */
+    PINSEL0 |= 0x00000005; /* Enable RxD0 and TxD0   */
     U0LCR = 0x83; /* 8 bits, no Parity, 1 Stop bit     */
     U0DLL = DIVISOR; /* 9600 Baud Rate @ CCLK/4 VPB Clock  */
     U0DLM = DIVISOR >> 8;

@@ -1,8 +1,10 @@
-#ifndef _ESP01_H_
-#define _ESP01_H_
+#ifndef __ESP01_H__
+#define __ESP01_H__
+#include "types.h"
 
 void esp01_connectAP(void);
-void esp01_sendToThingspeak(char *);
-void esp01_sendToThingspeak_set_point(float val);
+void esp01_sendToThingspeak(u32 val);
+void esp01_sendToThingspeak_set_point(u32 val);
+void esp01_readFromThingspeak(void);
 
 #endif
