@@ -1,4 +1,3 @@
-// 12/02/26
 #include <LPC214x.h>
 #include <stdio.h>
 #include <string.h>
@@ -26,16 +25,20 @@ u32 adcVal, key;
 f32 analog;
 u32 menu_flag = 0;
 u8 value[20], setPoint[20];
-void update_eeprom(s8 *arr){
+void update_eeprom(s8 *arr)
+{
     s32 i;
-    for (i = 0; i < 3; i++){
-        ByteWrite(i, arr[i]);
+    for (i = 0; i < 3; i++)
+    {
+        ByteWrite(0x0000 + i, arr[i]);
     }
 }
-void show_setpoints(void){
+void show_setpoints(void)
+{
     int i;
     u8 arr[4];
-    for (i = 0; i < 3; i++){
+    for (i = 0; i < 3; i++)
+    {
         arr[i] = ByteRead(i);
     }
     arr[i] = '\0';
@@ -48,24 +51,25 @@ void show_setpoints(void){
     delay_ms(2000);
     CmdLCD(CLEAR_LCD);
 }
-void update_setpoints(void){
+void update_setpoints(void)
+{
     s32 i;
     u8 arr[10];
     CmdLCD(CLEAR_LCD);
-    CmdLCD(GOTO_LINE1_POS0);
     StrLCD("ENTER SET PTS");
-    CmdLCD(GOTO_LINE2_POS0);
-    StrLCD("MINIMUM 3 NUMS");
-    for (i = 0; i < 3; i++){
+    for (i = 0; i < 3; i++)
+    {
         key = KeyScan();
         arr[i] = key;
-        CmdLCD(GOTO_LINE3_POS0 + i);
+        CmdLCD(GOTO_LINE2_POS0 + i);
         CharLCD(key);
-        while (ColScan() == 0);
+        while (ColScan() == 0)
+            ;
     }
     arr[i] = '\0';
     i = 0;
-    for (i = 0; i < 3; i++){
+    for (i = 0; i < 3; i++)
+    {
         ByteWrite(i, arr[i]);
     }
     delay_ms(500);
@@ -76,11 +80,11 @@ void update_setpoints(void){
     CmdLCD(GOTO_LINE2_POS0);
     StrLCD("IN EEPROM");
     delay_ms(1000);
-    CmdLCD(CLEAR_LCD);
     esp01_sendToThingspeak_set_point((u32)atoi((char *)setPoint));
     CmdLCD(CLEAR_LCD);
 }
-int main(void){
+int main(void)
+{
     Init_LCD();
     Init_ADC();
     RTC_Init();
@@ -101,44 +105,45 @@ int main(void){
     CmdLCD(GOTO_LINE2_POS0);
     StrLCD("***FROM CLOUD***");
     delay_ms(2000);
-    CmdLCD(GOTO_LINE1_POS0);
-    StrLCD("READ SETPOINT");
-    CmdLCD(GOTO_LINE2_POS0);
     StrLCD((s8 *)value);
     delay_ms(2000);
     strcpy((char *)setPoint, (char *)value);
     update_eeprom((s8 *)setPoint);
+
     CmdLCD(GOTO_LINE1_POS0);
     StrLCD("SETPOINT UPDATED");
     CmdLCD(GOTO_LINE2_POS0);
     StrLCD("***IN EEPROM****");
     delay_ms(2000);
+
     CmdLCD(CLEAR_LCD);
-    while (1){
-        if (atoi((char *)adc_str) > atoi((char *)setPoint)){
+    while (1)
+    {
+        if (strcmp((char *)setPoint, (char *)adc_str) > 0)
+        {
             IOSET0 = 1 << BUZZER;
         }
-        while (menu_flag){
-            menu_flag = 0;
+        while (menu_flag)
+        {
+
             CmdLCD(CLEAR_LCD);
             StrLCD("1:SHOW SETPTS");
             CmdLCD(GOTO_LINE2_POS0);
             StrLCD("2:UPDATE SET");
-            CmdLCD(GOTO_LINE3_POS0);
-            StrLCD("3:EXIT");
             key = KeyScan();
-            while (ColScan() == 0);
+            while (ColScan() == 0)
+                ;
             if (key == '1')
                 show_setpoints();
             else if (key == '2')
                 update_setpoints();
-            else if (key == '3')
-                break;
+            menu_flag = 0;
         }
         GetRTCTimeInfo(&hr, &min, &sec);
         Read_ADC(1, &adcVal, &analog);
         sprintf((char *)adc_str, "%lu", adcVal);
-        if ((min % 3 == 0) && (min != prev_min)){
+        if ((min % 2 == 0) && (min != prev_min))
+        {
             // if((min != prev_min)){
             prev_min = min;
             esp01_sendToThingspeak(adcVal);
@@ -146,7 +151,8 @@ int main(void){
             uart0_str((u8 *)adc_str);
             uart0_str("\r\n");
         }
-        if ((min % 5 == 0) && (min != 0) && (prev_cloud_read != min)){
+        if ((min % 5 == 0) && (min != 0) && (prev_cloud_read != min))
+        {
             prev_cloud_read = min;
             esp01_readFromThingspeak();
             CmdLCD(GOTO_LINE1_POS0);
