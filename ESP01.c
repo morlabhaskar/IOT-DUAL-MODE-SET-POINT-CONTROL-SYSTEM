@@ -244,7 +244,7 @@ void esp01_sendToThingspeak_set_point(u32 val){
         uart0_str("AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80\r\n");
         i = 0;
         memset(buff, '\0', 200);
-        while (i < 5);
+       while (i < 5);
         delay_ms(2500);
         buff[i] = '\0';
         delay_ms(500);
