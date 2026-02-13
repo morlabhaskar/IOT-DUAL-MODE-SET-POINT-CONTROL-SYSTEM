@@ -6,7 +6,7 @@
 #include "pin_functions_defines.h"
 
 void Init_ADC(void){
-    //cfg p0.27 as AINO input pin
+    //cfg p0.28 as AINO input pin
     CfgPortPinFunc(0,28,AIN1_0_28);
     //cfg ADCR
     ADCR = (1<<PDN_BIT)|(CLKDIV<<CLKDIV_BITS);
@@ -25,6 +25,16 @@ void Read_ADC(u32 chNo,u32 *adcDVal,f32 *analogReading){
     //read the digital result after successfull conversion
     *adcDVal=((ADDR>>RESULT_BITS)&1023);
     //convert to equivalent analog reading in volts
-    *analogReading=*adcDVal*(3.3/1024);
+    *analogReading=(*adcDVal)*(3.3/1023);
 }
+// void Read_ADC(int chno,int* adcVal,float* analogReading)
+// {
+//         ADCR&=0xFFFFFF00;
+//         ADCR|=(1<<START_CONV_BIT)|(1<<chno);
+//         delay_us(3);
+//         while(((ADDR>>DONE_BIT)&1)==0);
+//         ADCR&=~(1<<START_CONV_BIT);
+//         *adcVal=((ADDR>>RESULT_BITS)&1023);
+//         *analogReading=(*adcVal)*(3.3/1023);
+// }
 

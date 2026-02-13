@@ -23,9 +23,10 @@ u8 adc_str[16];
 s32 hr = 0, min = 0, sec = 0;
 s32 prev_min = -1, prev_cloud_read = -1;
 u32 key;
-f32 temperature;
+// f32 temperature;
 u32 menu_flag = 0;
 u8 value[20], setPoint[20];
+f32 degF,degC;
 void update_eeprom(s8 *arr){
     s32 i;
     for (i = 0; i < 3; i++){
@@ -97,12 +98,19 @@ void update_setpoints(void){
     esp01_sendToThingspeak_set_point((u32)atoi((char *)setPoint));
     CmdLCD(CLEAR_LCD);
 }
-void Read_LM35(f32 *temperature){
-    u32 adcVal;
-    f32 analog;
-    Read_ADC(1, &adcVal, &analog);
-    *temperature=(analog*100.0);
+void Read_LM35(float *degC,float *degF){
+        u32 adc;
+        float ear;
+        Read_ADC(1,&adc,&ear);
+        *degC=ear*100.0;
+        *degF=((*degC)*(9/5))+32;
 }
+// void Read_LM35(f32 *temperature){
+//     u32 adcVal;
+//     f32 analog;
+//     Read_ADC(1, &adcVal, &analog);
+//     *temperature=analog*100;
+// }
 void floatToString(float val, char *str){
     int ip = (int)val;
     int fp = (int)((val - ip) * 100);
@@ -126,13 +134,13 @@ int main(void){
     CmdLCD(GOTO_LINE4_POS0);
     StrLCD("*CONTROL SYSTEM*");
     delay_ms(3000);
-    esp01_connectAP();
+    //esp01_connectAP();
     delay_ms(1000);
     CmdLCD(CLEAR_LCD);
     IODIR0 |= 1 << BUZZER;
     IOCLR0 = 1 << BUZZER;
     SetRTCTimeInfo(hr, min, sec);
-    esp01_readFromThingspeak();
+    //esp01_readFromThingspeak();
     CmdLCD(GOTO_LINE1_POS0);
     StrLCD("*SETPOINT READ**");
     CmdLCD(GOTO_LINE2_POS0);
@@ -158,7 +166,7 @@ int main(void){
     delay_ms(2000);
     CmdLCD(CLEAR_LCD);
     while (1){
-        if ((int)temperature > atoi((char *)setPoint)){
+        if ((int)degC > atoi((char *)setPoint)){
             IOSET0 = 1 << BUZZER;
         }
         else{
@@ -186,12 +194,14 @@ int main(void){
             CmdLCD(CLEAR_LCD);
         }
         GetRTCTimeInfo(&hr, &min, &sec);
-        Read_LM35(&temperature);
-        floatToString(temperature, (char *)adc_str);
+        // Read_LM35(&temperature);
+        Read_LM35(&degC,&degF);
+        // temperature = read_adc();
+        floatToString(degC, (char *)adc_str);
         if ((min % 3 == 0) && (min != prev_min)){
             // if((min != prev_min)){
             prev_min = min;
-            esp01_sendToThingspeak((u32)temperature);
+            esp01_sendToThingspeak((u32)degC);
             uart0_str("ADC Sent: ");
             uart0_str((u8 *)adc_str);
             uart0_str("\r\n");
